@@ -28,14 +28,8 @@ body {
 }
 
 @keyframes fadeSlide {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 h2 {
@@ -103,7 +97,7 @@ button:hover {
 
 <body>
 
-<!-- LICENSE LOGIN -->
+<!-- LICENSE SCREEN -->
 <div class="card" id="licenseCard">
     <h2>Enter License Key</h2>
     <input id="licenseInput" placeholder="EXEL-XXXX-XXXX-XXXX">
@@ -127,13 +121,13 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/re
 
 <script>
 const validKeys = [
-"EXEL-9F3A-K2Q8-7M1C","EXEL-A7D4-P9X2-LM8Q","EXEL-4Q8M-Z1C7-APD9",
-"EXEL-KM3Q-7A8P-XD91","EXEL-Z9P2-QA7M-8D1C","EXEL-1C7M-AQ9Z-PD84",
-"EXEL-8PZ1-QD7A-MC94","EXEL-QM9A-7Z8C-DP14","EXEL-74PZ-Q1M8-A9DC",
-"EXEL-XA1Q-8MZ7-PD9C","EXEL-91ZC-QMP8-7A4D","EXEL-P7A8-ZDQM-91C4",
-"EXEL-QZ4P-8M1A-7D9C","EXEL-8A1M-9QZP-7DC4","EXEL-DQ7Z-P9A1-8MC4",
-"EXEL-M8Q1-Z7DP-A94C","EXEL-ZA9D-Q8M7-P1C4","EXEL-Q1M7-8Z9A-DPC4",
-"EXEL-7ZQ8-APM1-D9C4","EXEL-9A7M-QZP1-8DC4"
+"EXEL-4A9Q-Z7M1-D8PC","EXEL-Q8M1-7Z9A-PD4C","EXEL-91ZQ-A7M8-DP4C",
+"EXEL-ZM7A-Q9P1-84DC","EXEL-7Q1M-AZ9P-D84C","EXEL-P9Z8-QA7M-1D4C",
+"EXEL-A1MZ-7Q9P-D84C","EXEL-QZ9A-1M7P-D84C","EXEL-8M1Q-ZA7P-D94C",
+"EXEL-7PZQ-9A1M-D84C","EXEL-ZQ1A-7M9P-D84C","EXEL-9MZQ-A7P1-D84C",
+"EXEL-Q7ZP-1A9M-D84C","EXEL-A9Q7-MZP1-D84C","EXEL-1ZQ9-A7MP-D84C",
+"EXEL-QP7Z-91AM-D84C","EXEL-7A9M-QZP1-D84C","EXEL-ZP1Q-A9M7-D84C",
+"EXEL-9Q7A-ZMP1-D84C","EXEL-MQZ7-A9P1-D84C"
 ];
 
 function checkLicense() {
@@ -163,7 +157,7 @@ function copyAny(btn) {
     setTimeout(() => btn.innerText = "Copy", 1500);
 }
 
-// Auto unlock
+// Auto-unlock if already licensed
 if (localStorage.getItem("license")) {
     showContent();
 }
