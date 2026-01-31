@@ -24,6 +24,18 @@ body {
     max-width: 520px;
     color: #fff;
     text-align: center;
+    animation: fadeSlide 0.6s ease;
+}
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 h2 {
@@ -33,37 +45,32 @@ h2 {
 
 input {
     width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 6px;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
     border: none;
     outline: none;
+    font-size: 1em;
 }
 
 button {
     width: 100%;
-    padding: 10px;
-    margin-top: 10px;
+    padding: 12px;
+    margin-top: 15px;
     background: #8b5cf6;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 1em;
+    transition: transform 0.15s ease, background 0.15s ease;
 }
 
 button:hover {
     background: #a78bfa;
+    transform: scale(1.03);
 }
 
-.link {
-    margin-top: 10px;
-    font-size: 0.9em;
-    cursor: pointer;
-    color: #ddd;
-}
-
-/* COPY BOX */
 .copy-box {
     margin-top: 15px;
     display: flex;
@@ -85,27 +92,23 @@ button:hover {
     width: auto;
     padding: 8px 14px;
 }
+
+.error {
+    color: #fecaca;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div class="card" id="loginCard">
-    <h2>Login</h2>
-    <input id="loginUser" placeholder="Username">
-    <input id="loginPass" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div class="link" onclick="showRegister()">Create account</div>
-</div>
-
-<!-- REGISTER -->
-<div class="card" id="registerCard" style="display:none;">
-    <h2>Register</h2>
-    <input id="regUser" placeholder="Username">
-    <input id="regPass" type="password" placeholder="Password">
-    <button onclick="register()">Register</button>
-    <div class="link" onclick="showLogin()">Back to login</div>
+<!-- LICENSE LOGIN -->
+<div class="card" id="licenseCard">
+    <h2>Enter License Key</h2>
+    <input id="licenseInput" placeholder="EXEL-XXXX-XXXX-XXXX">
+    <button onclick="checkLicense()">Unlock</button>
+    <div class="error" id="errorText"></div>
 </div>
 
 <!-- CONTENT -->
@@ -119,50 +122,38 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/re
         <button onclick="copyAny(this)">Copy</button>
     </div>
 
-    <button style="margin-top:15px;background:#ef4444;" onclick="logout()">Logout</button>
+    <button style="margin-top:20px;background:#ef4444;" onclick="logout()">Logout</button>
 </div>
 
 <script>
-const users = JSON.parse(localStorage.getItem("users") || "{}");
+const validKeys = [
+"EXEL-9F3A-K2Q8-7M1C","EXEL-A7D4-P9X2-LM8Q","EXEL-4Q8M-Z1C7-APD9",
+"EXEL-KM3Q-7A8P-XD91","EXEL-Z9P2-QA7M-8D1C","EXEL-1C7M-AQ9Z-PD84",
+"EXEL-8PZ1-QD7A-MC94","EXEL-QM9A-7Z8C-DP14","EXEL-74PZ-Q1M8-A9DC",
+"EXEL-XA1Q-8MZ7-PD9C","EXEL-91ZC-QMP8-7A4D","EXEL-P7A8-ZDQM-91C4",
+"EXEL-QZ4P-8M1A-7D9C","EXEL-8A1M-9QZP-7DC4","EXEL-DQ7Z-P9A1-8MC4",
+"EXEL-M8Q1-Z7DP-A94C","EXEL-ZA9D-Q8M7-P1C4","EXEL-Q1M7-8Z9A-DPC4",
+"EXEL-7ZQ8-APM1-D9C4","EXEL-9A7M-QZP1-8DC4"
+];
 
-function showRegister() {
-    loginCard.style.display = "none";
-    registerCard.style.display = "block";
-}
-
-function showLogin() {
-    registerCard.style.display = "none";
-    loginCard.style.display = "block";
-}
-
-function register() {
-    const u = regUser.value;
-    const p = regPass.value;
-    if (!u || !p) return alert("Fill all fields");
-    if (users[u]) return alert("User already exists");
-    users[u] = p;
-    localStorage.setItem("users", JSON.stringify(users));
-    alert("Account created!");
-    showLogin();
-}
-
-function login() {
-    const u = loginUser.value;
-    const p = loginPass.value;
-    if (users[u] !== p) return alert("Invalid login");
-    localStorage.setItem("loggedIn", u);
+function checkLicense() {
+    const key = licenseInput.value.trim().toUpperCase();
+    if (!validKeys.includes(key)) {
+        errorText.innerText = "Invalid license key";
+        return;
+    }
+    localStorage.setItem("license", key);
     showContent();
 }
 
-function logout() {
-    localStorage.removeItem("loggedIn");
-    location.reload();
+function showContent() {
+    licenseCard.style.display = "none";
+    contentCard.style.display = "block";
 }
 
-function showContent() {
-    loginCard.style.display = "none";
-    registerCard.style.display = "none";
-    contentCard.style.display = "block";
+function logout() {
+    localStorage.removeItem("license");
+    location.reload();
 }
 
 function copyAny(btn) {
@@ -172,8 +163,8 @@ function copyAny(btn) {
     setTimeout(() => btn.innerText = "Copy", 1500);
 }
 
-// Auto-login
-if (localStorage.getItem("loggedIn")) {
+// Auto unlock
+if (localStorage.getItem("license")) {
     showContent();
 }
 </script>
