@@ -6,7 +6,7 @@
 <title>Exel Hub Finder</title>
 
 <style>
-:root {
+:root{
     --bg:#020617;
     --card:rgba(15,23,42,.78);
     --border:rgba(56,189,248,.4);
@@ -14,15 +14,13 @@
     --text:#e5e7eb;
 }
 
-* { box-sizing: border-box; }
+*{box-sizing:border-box}
 
 body{
     margin:0;
     min-height:100vh;
     font-family:system-ui,sans-serif;
-    background:
-        radial-gradient(circle at top,#0f172a,transparent 60%),
-        linear-gradient(135deg,#020617,#020617);
+    background:radial-gradient(circle at top,#0f172a,transparent 60%),#020617;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -31,34 +29,22 @@ body{
 
 .card{
     width:94%;
-    max-width:520px;
+    max-width:540px;
     background:var(--card);
     border:1px solid var(--border);
     backdrop-filter:blur(14px);
     border-radius:20px;
     padding:30px;
     box-shadow:0 25px 50px rgba(0,0,0,.65);
-    animation:fade .4s ease;
 }
 
-@keyframes fade {
-    from { opacity:0; transform:translateY(18px); }
-    to { opacity:1; transform:none; }
-}
+h2{margin:0 0 14px;color:#7dd3fc;font-size:1.2em}
 
-h2{
-    margin:0 0 14px;
-    color:#7dd3fc;
-    font-size:1.2em;
-}
-
-/* INPUT (FIXED SIZE) */
 input{
     width:100%;
     max-width:420px;
     margin:0 auto;
     display:block;
-
     padding:13px 14px;
     font-size:.98em;
     border-radius:12px;
@@ -68,11 +54,7 @@ input{
     text-align:center;
 }
 
-input::placeholder{ color:#94a3b8; }
-
 button{
-    width:100%;
-    margin-top:16px;
     padding:12px;
     border-radius:12px;
     border:none;
@@ -82,15 +64,24 @@ button{
     cursor:pointer;
 }
 
-button:hover{
-    box-shadow:0 0 20px rgba(56,189,248,.45);
+button:hover{box-shadow:0 0 20px rgba(56,189,248,.45)}
+
+.full{width:100%;margin-top:16px}
+
+.row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:14px;
 }
 
-.small{
-    margin-top:10px;
+.square{
+    padding:10px 14px;
+    border-radius:10px;
     font-size:.85em;
-    opacity:.75;
-    text-align:center;
+    background:rgba(56,189,248,.15);
+    border:1px solid var(--border);
+    color:#7dd3fc;
 }
 
 .dashboard{
@@ -120,15 +111,26 @@ button:hover{
 }
 
 .copy-box button{
-    width:auto;
     padding:8px 14px;
+    font-size:.85em;
 }
 
-.keylist{
-    margin-top:14px;
-    font-size:.8em;
-    white-space:pre-wrap;
-    color:#7dd3fc;
+.logout{
+    margin-top:18px;
+    background:#ef4444;
+    color:white;
+}
+
+.toast{
+    margin-bottom:12px;
+    padding:10px;
+    border-radius:10px;
+    background:rgba(34,197,94,.15);
+    border:1px solid rgba(34,197,94,.5);
+    color:#bbf7d0;
+    display:none;
+    text-align:center;
+    font-size:.9em;
 }
 </style>
 </head>
@@ -139,16 +141,20 @@ button:hover{
 <div class="card" id="login">
     <h2>Enter License Key</h2>
     <input id="keyInput" placeholder="EXEL-XH-XXXX-XXXX">
-    <button onclick="redeem()">Redeem</button>
-    <div class="small">Admin? Enter admin key</div>
+    <button class="full" onclick="redeem()">Redeem</button>
 </div>
 
-<!-- USER APP -->
+<!-- APP -->
 <div class="card" id="app" style="display:none;">
     <h2>exel hub finder paid, find brainrots INSTANTLY ⚡⏩</h2>
 
-    <div class="dashboard">
-        ⏳ Time remaining: <b id="timeLeft">--:--:--</b>
+    <div class="row">
+        <div class="dashboard">
+            ⏳ Time remaining: <b id="timeLeft">--:--:--</b>
+        </div>
+        <button id="adminBtn" class="square" onclick="openAdmin()" style="display:none;">
+            Admin Dashboard
+        </button>
     </div>
 
     <div class="copy-box">
@@ -157,69 +163,90 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/re
         </span>
         <button onclick="copyScript(this)">Copy</button>
     </div>
+
+    <button class="full logout" onclick="logout()">Logout</button>
 </div>
 
 <!-- ADMIN DASHBOARD -->
 <div class="card" id="admin" style="display:none;">
+    <div class="toast" id="toast">Copied to clipboard 📋</div>
     <h2>Admin Dashboard</h2>
 
-    <button onclick="generateKey(3600)">Generate 1 Hour Key</button>
-    <button onclick="generateKey(7200)">Generate 2 Hour Key</button>
-    <button onclick="generateKey(10800)">Generate 3 Hour Key</button>
-    <button onclick="generateKey(14400)">Generate 4 Hour Key</button>
+    <button class="full" onclick="gen(3600)">Generate 1 Hour Key</button>
+    <button class="full" onclick="gen(7200)">Generate 2 Hour Key</button>
+    <button class="full" onclick="gen(10800)">Generate 3 Hour Key</button>
+    <button class="full" onclick="gen(14400)">Generate 4 Hour Key</button>
+    <button class="full" onclick="gen(86400)">Generate 1 Day Key</button>
+    <button class="full" onclick="gen(604800)">Generate 1 Week Key</button>
 
-    <div class="dashboard keylist" id="output"></div>
+    <button class="full logout" onclick="back()">Back</button>
 </div>
 
 <script>
 /* 🔐 CHANGE THIS */
-const ADMIN_KEY = "EXELADMINS2704";
+const ADMIN_KEY = "EXEL-ADMIN-2704";
 
 /* STORED KEYS */
-let keys = JSON.parse(localStorage.getItem("keys") || "{}");
+let keys = JSON.parse(localStorage.getItem("keys")||"{}");
+let isAdmin = false;
 
 /* REDEEM */
 function redeem(){
     const v = keyInput.value.trim().toUpperCase();
 
     if(v === ADMIN_KEY){
-        login.style.display="none";
-        admin.style.display="block";
+        isAdmin = true;
+        localStorage.setItem("admin","true");
+        showApp(true);
         return;
     }
 
-    if(!keys[v]){
-        alert("Invalid license key");
-        return;
-    }
+    if(!keys[v]){ alert("Invalid key"); return; }
 
-    const expiresAt = Date.now() + (keys[v] * 1000);
-    localStorage.setItem("expiresAt", expiresAt);
-    showApp();
+    const expiresAt = Date.now() + keys[v]*1000;
+    localStorage.setItem("expiresAt",expiresAt);
+    showApp(false);
 }
 
-/* USER APP */
-function showApp(){
+/* APP */
+function showApp(admin){
     login.style.display="none";
-    admin.style.display="none";
+    admin && (adminBtn.style.display="inline-block");
     app.style.display="block";
-    tick();
+    if(admin){
+        timeLeft.textContent="inf ♾️";
+    } else {
+        tick();
+    }
 }
 
 function tick(){
     const expires = +localStorage.getItem("expiresAt");
-    const left = Math.floor((expires - Date.now()) / 1000);
-
-    if(left <= 0){
-        localStorage.clear();
-        location.reload();
-        return;
-    }
-
-    timeLeft.textContent =
-        new Date(left * 1000).toISOString().substr(11,8);
-
+    const left = Math.floor((expires-Date.now())/1000);
+    if(left<=0){ logout(); return; }
+    timeLeft.textContent=new Date(left*1000).toISOString().substr(11,8);
     setTimeout(tick,1000);
+}
+
+/* ADMIN */
+function openAdmin(){
+    app.style.display="none";
+    admin.style.display="block";
+}
+
+function back(){
+    admin.style.display="none";
+    app.style.display="block";
+}
+
+function gen(seconds){
+    const key="EXEL-"+Math.random().toString(36).substring(2,6).toUpperCase()
+            +"-"+Math.random().toString(36).substring(2,6).toUpperCase();
+    keys[key]=seconds;
+    localStorage.setItem("keys",JSON.stringify(keys));
+    navigator.clipboard.writeText(key);
+    toast.style.display="block";
+    setTimeout(()=>toast.style.display="none",1600);
 }
 
 /* COPY */
@@ -229,22 +256,18 @@ function copyScript(btn){
     setTimeout(()=>btn.textContent="Copy",1200);
 }
 
-/* ADMIN GENERATOR */
-function generateKey(seconds){
-    const key =
-        "EXEL-" +
-        Math.random().toString(36).substring(2,6).toUpperCase() +
-        "-" +
-        Math.random().toString(36).substring(2,6).toUpperCase();
-
-    keys[key] = seconds;
-    localStorage.setItem("keys", JSON.stringify(keys));
-    output.textContent += `${key} (${seconds/3600}h)\n`;
+/* LOGOUT */
+function logout(){
+    localStorage.clear();
+    location.reload();
 }
 
 /* AUTO LOGIN */
-if(localStorage.getItem("expiresAt")){
-    showApp();
+if(localStorage.getItem("admin")==="true"){
+    isAdmin=true;
+    showApp(true);
+} else if(localStorage.getItem("expiresAt")){
+    showApp(false);
 }
 </script>
 
