@@ -29,7 +29,7 @@ body{
 
 .card{
     width:94%;
-    max-width:540px;
+    max-width:560px;
     background:var(--card);
     border:1px solid var(--border);
     backdrop-filter:blur(14px);
@@ -55,7 +55,7 @@ input{
 }
 
 button{
-    padding:12px;
+    padding:12px 14px;
     border-radius:12px;
     border:none;
     background:linear-gradient(135deg,#38bdf8,#60a5fa);
@@ -70,27 +70,27 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.45)}
 
 .row{
     display:flex;
-    align-items:center;
-    gap:10px;
+    gap:12px;
     margin-top:14px;
+    align-items:stretch;
 }
 
-.square{
-    padding:10px 14px;
-    border-radius:10px;
-    font-size:.85em;
-    background:rgba(56,189,248,.15);
-    border:1px solid var(--border);
-    color:#7dd3fc;
-}
-
-.dashboard{
-    margin-top:16px;
+.pill{
+    flex:1;
     padding:14px;
     border-radius:14px;
     background:rgba(2,6,23,.8);
     border:1px solid var(--border);
     font-size:.95em;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.admin-pill{
+    background:rgba(56,189,248,.12);
+    color:#7dd3fc;
 }
 
 .copy-box{
@@ -108,11 +108,6 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.45)}
     font-size:.8em;
     color:#7dd3fc;
     word-break:break-all;
-}
-
-.copy-box button{
-    padding:8px 14px;
-    font-size:.85em;
 }
 
 .logout{
@@ -149,10 +144,10 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.45)}
     <h2>exel hub finder paid, find brainrots INSTANTLY ⚡⏩</h2>
 
     <div class="row">
-        <div class="dashboard">
+        <div class="pill">
             ⏳ Time remaining: <b id="timeLeft">--:--:--</b>
         </div>
-        <button id="adminBtn" class="square" onclick="openAdmin()" style="display:none;">
+        <button id="adminBtn" class="pill admin-pill" style="display:none;" onclick="openAdmin()">
             Admin Dashboard
         </button>
     </div>
@@ -167,7 +162,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/re
     <button class="full logout" onclick="logout()">Logout</button>
 </div>
 
-<!-- ADMIN DASHBOARD -->
+<!-- ADMIN -->
 <div class="card" id="admin" style="display:none;">
     <div class="toast" id="toast">Copied to clipboard 📋</div>
     <h2>Admin Dashboard</h2>
@@ -183,36 +178,37 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/re
 </div>
 
 <script>
-/* 🔐 CHANGE THIS */
+/* 🔐 ADMIN KEY (LOCKED) */
 const ADMIN_KEY = "EXEL-ADMIN-2704";
 
-/* STORED KEYS */
+/* KEYS */
 let keys = JSON.parse(localStorage.getItem("keys")||"{}");
-let isAdmin = false;
 
 /* REDEEM */
 function redeem(){
     const v = keyInput.value.trim().toUpperCase();
 
     if(v === ADMIN_KEY){
-        isAdmin = true;
         localStorage.setItem("admin","true");
         showApp(true);
         return;
     }
 
-    if(!keys[v]){ alert("Invalid key"); return; }
+    if(!keys[v]){
+        alert("Invalid license key");
+        return;
+    }
 
-    const expiresAt = Date.now() + keys[v]*1000;
-    localStorage.setItem("expiresAt",expiresAt);
+    localStorage.setItem("expiresAt", Date.now() + keys[v]*1000);
     showApp(false);
 }
 
 /* APP */
 function showApp(admin){
     login.style.display="none";
-    admin && (adminBtn.style.display="inline-block");
     app.style.display="block";
+    adminBtn.style.display = admin ? "flex" : "none";
+
     if(admin){
         timeLeft.textContent="inf ♾️";
     } else {
@@ -256,15 +252,15 @@ function copyScript(btn){
     setTimeout(()=>btn.textContent="Copy",1200);
 }
 
-/* LOGOUT */
+/* LOGOUT (SAFE) */
 function logout(){
-    localStorage.clear();
+    localStorage.removeItem("expiresAt");
+    localStorage.removeItem("admin");
     location.reload();
 }
 
 /* AUTO LOGIN */
 if(localStorage.getItem("admin")==="true"){
-    isAdmin=true;
     showApp(true);
 } else if(localStorage.getItem("expiresAt")){
     showApp(false);
