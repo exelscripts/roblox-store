@@ -351,17 +351,17 @@ function gen(seconds){
     localStorage.setItem("keys",JSON.stringify(keys));
     localStorage.setItem("activeKeys",JSON.stringify(activeKeys));
 
-    // Copy inside click event
+    // Copy first, before doing anything else
     navigator.clipboard.writeText(key).then(()=>{
         const toast=document.getElementById("toast");
         toast.textContent=`Copied to clipboard 📋 → ${key}`;
         toast.style.display="block";
         setTimeout(()=>toast.style.display="none",1800);
     }).catch(err=>{
-        alert("Failed to copy. Please copy manually: "+key);
+        alert("Copy failed! Key: "+key);
     });
+}
 
-    renderAdminPanel();
 }
 
 // AUTO LOGIN
@@ -370,4 +370,5 @@ else if(localStorage.getItem("currentKey") && activeKeys[localStorage.getItem("c
 </script>
 </body>
 </html>
+
 
