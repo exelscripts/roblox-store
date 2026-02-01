@@ -17,6 +17,7 @@ body{
   color:#e5e7eb;
 }
 
+/* ===== CARD ===== */
 .card{
   width:90%;
   max-width:480px;
@@ -92,13 +93,27 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
   white-space:nowrap;       
   overflow-x:auto;          
   text-overflow:ellipsis;
+  padding-right:6px;
 }
 
-.copy-box button{
-  flex:0 0 auto;            
-  padding:6px 12px;         
-  font-size:.8em;
-  border-radius:10px;
+/* Small square copy button */
+.copy-btn{
+  flex:0 0 auto;
+  width:32px;
+  height:32px;
+  border:none;
+  border-radius:8px;
+  background:linear-gradient(135deg,#38bdf8,#60a5fa);
+  color:#020617;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1em;
+}
+.copy-btn:hover{
+  box-shadow:0 0 8px rgba(56,189,248,.5);
 }
 
 /* ===== LOGOUT BUTTON ===== */
@@ -108,11 +123,15 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
   margin-top:14px;
 }
 
-/* ===== TOAST ===== */
+/* ===== TOAST AT TOP ===== */
 .toast{
+  position:fixed;
+  top:16px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:999;
   display:none;
-  margin-bottom:12px;
-  padding:10px;
+  padding:10px 16px;
   border-radius:10px;
   background:rgba(34,197,94,.15);
   border:1px solid rgba(34,197,94,.5);
@@ -120,43 +139,6 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
   text-align:center;
   font-size:.9em;
 }
-
-/* ===== MANAGEMENT PANEL ===== */
-#adminManagement { display:none; margin-bottom:10px; }
-#managementPanel {
-  background:rgba(2,6,23,.85);
-  border:1px solid rgba(56,189,248,.35);
-  border-radius:14px;
-  padding:10px;
-  max-height:200px;
-  overflow-y:auto;
-}
-
-.management-row {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:6px;
-  gap:6px;
-}
-
-.management-row span {
-  flex:1;
-  font-size:.85em;
-  color:#7dd3fc;
-  word-break:break-word;
-}
-
-.management-row button {
-  flex:0 0 auto;
-  padding:4px 8px;
-  font-size:.75em;
-  border-radius:8px;
-  cursor:pointer;
-}
-.management-row button.ban { background:#ef4444;color:white; }
-.management-row button.add { background:#22c55e;color:white; }
-.management-row button.remove { background:#facc15;color:#020617; }
 
 #adminPanel{display:none;margin-top:14px}
 </style>
@@ -184,21 +166,15 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
     </div>
   </div>
 
-  <!-- ADMIN MANAGEMENT BUTTON -->
-  <div id="adminManagement">
-    <button id="managementBtn" onclick="toggleManagement()" 
-            style="padding:6px 12px;font-size:.85em;">Management</button>
-    <div id="managementPanel"></div>
-  </div>
-
   <div class="toast" id="toast"></div>
   <div id="adminPanel"></div>
 
+  <!-- COPY BOX -->
   <div class="copy-box">
-    <span>
+    <span id="scriptLabel">
 loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/refs/heads/main/exel"))()
     </span>
-    <button onclick="copyScript()">Copy</button>
+    <button class="copy-btn" onclick="copyScript()">📋</button>
   </div>
 
   <button class="logout" onclick="logout()">Logout</button>
@@ -251,10 +227,8 @@ function showApp(admin){
   if(admin){
     timeLeft.textContent="inf ♾️";
     renderAdmin();
-    document.getElementById("adminManagement").style.display = "block";
   } else {
     startTimer();
-    document.getElementById("adminManagement").style.display = "none";
   }
 }
 
@@ -275,7 +249,7 @@ function startTimer(){
   tick();
 }
 
-/* ================= ADMIN ================= */
+/* ================= ADMIN DASHBOARD ================= */
 function toggleAdmin(){
   adminPanel.style.display =
     adminPanel.style.display==="block"?"none":"block";
@@ -296,117 +270,16 @@ function renderAdmin(){
   });
 }
 
-/* ================= MANAGEMENT PANEL ================= */
-function toggleManagement(){
-  const panel = document.getElementById("managementPanel");
-  panel.style.display = panel.style.display === "block" ? "none" : "block";
-
-  if(panel.style.display === "block"){
-    renderManagement();
-  }
-}
-
-async function renderManagement(){
-  const panel = document.getElementById("managementPanel");
-  panel.innerHTML = ""; // Clear old content
-
-  if(!localStorage.getItem("admin")) return;
-
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/licenses?is_banned=eq.false`, {
-    headers: { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` }
-  });
-  const data = await res.json();
-
-  if(!data.length){
-    panel.innerHTML = "<i>No active keys</i>";
-    return;
-  }
-
-  data.forEach(lic => {
-    const row = document.createElement("div");
-    row.className = "management-row";
-
-    const keyLabel = document.createElement("span");
-    keyLabel.textContent = lic.key + " (" + new Date(lic.expires_at).toLocaleString() + ")";
-
-    const banBtn = document.createElement("button");
-    banBtn.className = "ban";
-    banBtn.textContent = "Ban";
-    banBtn.onclick = () => banKey(lic.key);
-
-    const addBtn = document.createElement("button");
-    addBtn.className = "add";
-    addBtn.textContent = "+ Time";
-    addBtn.onclick = () => modifyTime(lic.key, true);
-
-    const removeBtn = document.createElement("button");
-    removeBtn.className = "remove";
-    removeBtn.textContent = "- Time";
-    removeBtn.onclick = () => modifyTime(lic.key, false);
-
-    row.appendChild(keyLabel);
-    row.appendChild(banBtn);
-    row.appendChild(addBtn);
-    row.appendChild(removeBtn);
-
-    panel.appendChild(row);
-  });
-}
-
-// ================= ADMIN ACTIONS =================
-async function banKey(key){
-  if(!confirm(`Ban key ${key}?`)) return;
-
-  await fetch(`${SUPABASE_URL}/rest/v1/licenses?key=eq.${key}`, {
-    method:"PATCH",
-    headers:{
-      "Content-Type":"application/json",
-      apikey:SUPABASE_KEY,
-      Authorization:`Bearer ${SUPABASE_KEY}`
-    },
-    body:JSON.stringify({ is_banned:true })
-  });
-
-  alert(`Key ${key} has been banned`);
-  renderManagement();
-}
-
-async function modifyTime(key, add){
-  let seconds = parseInt(prompt(`Enter seconds to ${add ? "add" : "remove"}:`));
-  if(isNaN(seconds)) return;
-
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/licenses?key=eq.${key}`, {
-    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` }
-  });
-  const data = await res.json();
-  if(!data.length) return;
-
-  const expires = add ? data[0].expires_at + seconds*1000 : data[0].expires_at - seconds*1000;
-
-  await fetch(`${SUPABASE_URL}/rest/v1/licenses?key=eq.${key}`, {
-    method:"PATCH",
-    headers:{
-      "Content-Type":"application/json",
-      apikey:SUPABASE_KEY,
-      Authorization:`Bearer ${SUPABASE_KEY}`
-    },
-    body:JSON.stringify({ expires_at:expires })
-  });
-
-  alert(`Key ${key} updated`);
-  renderManagement();
-}
-
-/* ================= UTILS ================= */
+/* ================= COPY SCRIPT ================= */
 function copyScript(){
-  navigator.clipboard.writeText(
-    document.querySelector(".copy-box span").innerText
-  );
+  const text = document.getElementById("scriptLabel").innerText;
+  navigator.clipboard.writeText(text);
   toast.textContent="Copied to clipboard 📋";
   toast.style.display="block";
   setTimeout(()=>toast.style.display="none",1200);
 }
 
+/* ================= LOGOUT ================= */
 function logout(){
   localStorage.clear();
   location.reload();
