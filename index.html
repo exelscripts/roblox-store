@@ -17,6 +17,24 @@ body{
   color:#e5e7eb;
 }
 
+/* ===== STATUS BAR TOP CENTER ===== */
+#statusBar{
+  position:fixed;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:1000;
+  background:rgba(34,197,94,0.15);
+  border:1px solid rgba(34,197,94,0.5);
+  padding:10px 20px;
+  border-radius:0 0 10px 10px;
+  font-size:0.9em;
+  color:#bbf7d0;
+  display:none;
+  text-align:center;
+  min-width:200px;
+}
+
 /* ===== CARD ===== */
 .card{
   width:90%;
@@ -27,8 +45,10 @@ body{
   border-radius:20px;
   padding:20px;
   box-shadow:0 30px 60px rgba(0,0,0,.6);
+  position:relative;
 }
 
+/* ===== HEADINGS ===== */
 h2{margin:0 0 16px;color:#7dd3fc}
 
 /* ===== LICENSE KEY INPUT ===== */
@@ -47,14 +67,10 @@ h2{margin:0 0 16px;color:#7dd3fc}
 
 /* ===== BUTTONS ===== */
 button{
-  width:100%;
-  padding:14px;
   border:none;
   border-radius:12px;
-  background:linear-gradient(135deg,#38bdf8,#60a5fa);
-  color:#020617;
-  font-weight:700;
   cursor:pointer;
+  font-weight:700;
 }
 button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
 
@@ -106,7 +122,6 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
   background:linear-gradient(135deg,#38bdf8,#60a5fa);
   color:#020617;
   font-weight:700;
-  cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -118,33 +133,38 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
 
 /* ===== LOGOUT BUTTON ===== */
 .logout{
+  width:100%;
+  padding:14px;
+  margin-top:14px;
   background:#ef4444;
   color:white;
-  margin-top:14px;
 }
 
-/* ===== TOAST AT TOP ===== */
-.toast{
-  position:fixed;
-  top:16px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:999;
+/* ===== ADMIN DASHBOARD ===== */
+#adminPanel{
   display:none;
-  padding:10px 16px;
-  border-radius:10px;
-  background:rgba(34,197,94,.15);
-  border:1px solid rgba(34,197,94,.5);
-  color:#bbf7d0;
-  text-align:center;
-  font-size:.9em;
+  margin-top:14px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
 }
-
-#adminPanel{display:none;margin-top:14px}
+#adminPanel button{
+  flex:1 1 calc(33% - 10px);
+  background:linear-gradient(135deg,#1f2937,#374151); /* dark grey glass */
+  color:white;
+  padding:10px;
+  font-size:0.85em;
+  border-radius:12px;
+}
+#adminPanel button:hover{
+  box-shadow:0 0 10px rgba(255,255,255,.2);
+}
 </style>
 </head>
-
 <body>
+
+<!-- STATUS BAR -->
+<div id="statusBar">Copied to clipboard 📋</div>
 
 <!-- LOGIN -->
 <div class="card" id="login">
@@ -166,7 +186,6 @@ button:hover{box-shadow:0 0 20px rgba(56,189,248,.5);}
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
   <div id="adminPanel"></div>
 
   <!-- COPY BOX -->
@@ -181,55 +200,41 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/re
 </div>
 
 <script>
-/* ================= CONFIG ================= */
+/* CONFIG */
 const SUPABASE_URL = "https://skdhrvgrpcuvvfedkinc.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrZGhydmdycGN1dnZmZWRraW5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5Mzk2MzMsImV4cCI6MjA4NTUxNTYzM30.YAZhwmjIrnqJfl-zVT6_a7zGDITbr6twMYCBoo_bbhs";
 const ADMIN_KEY = "EXEL-ADMIN-2704";
 
-/* ================= LOGIN ================= */
+/* LOGIN */
 async function redeem(){
   const key = keyInput.value.trim().toUpperCase();
   if(!key) return;
-
   if(key === ADMIN_KEY){
     localStorage.setItem("admin","1");
     showApp(true);
     return;
   }
-
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/licenses?key=eq.${key}&is_banned=eq.false`,
-    {
-      headers:{
-        apikey:SUPABASE_KEY,
-        Authorization:`Bearer ${SUPABASE_KEY}`
-      }
-    }
-  );
-
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/licenses?key=eq.${key}&is_banned=eq.false`,{
+    headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}
+  });
   const data = await res.json();
   if(!data.length){ alert("Invalid key"); return; }
-
   const lic = data[0];
   if(Date.now() >= lic.expires_at){ alert("Key expired"); return; }
-
   localStorage.setItem("key", key);
   localStorage.setItem("expires", lic.expires_at);
   showApp(false);
 }
 
-/* ================= APP ================= */
+/* APP */
 function showApp(admin){
   login.style.display="none";
   app.style.display="block";
   adminBtn.style.display = admin ? "flex":"none";
-
   if(admin){
     timeLeft.textContent="inf ♾️";
     renderAdmin();
-  } else {
-    startTimer();
-  }
+  } else { startTimer(); }
 }
 
 function startTimer(){
@@ -249,19 +254,15 @@ function startTimer(){
   tick();
 }
 
-/* ================= ADMIN DASHBOARD ================= */
+/* ADMIN DASHBOARD */
 function toggleAdmin(){
   adminPanel.style.display =
-    adminPanel.style.display==="block"?"none":"block";
+    adminPanel.style.display==="flex"?"none":"flex";
 }
 
 function renderAdmin(){
   adminPanel.innerHTML="";
-  const times=[
-    ["1 Hour",3600],
-    ["1 Day",86400],
-    ["1 Week",604800]
-  ];
+  const times=[["1 Hour",3600],["1 Day",86400],["1 Week",604800]];
   times.forEach(t=>{
     const b=document.createElement("button");
     b.textContent="Generate "+t[0];
@@ -270,30 +271,29 @@ function renderAdmin(){
   });
 }
 
-/* ================= COPY SCRIPT ================= */
+/* COPY SCRIPT WITH STATUS BAR */
 function copyScript(){
   const text = document.getElementById("scriptLabel").innerText;
   navigator.clipboard.writeText(text);
-  toast.textContent="Copied to clipboard 📋";
-  toast.style.display="block";
-  setTimeout(()=>toast.style.display="none",1200);
+  const statusBar = document.getElementById("statusBar");
+  statusBar.style.display="block";
+  setTimeout(()=>statusBar.style.display="none",1200);
 }
 
-/* ================= LOGOUT ================= */
+/* LOGOUT */
 function logout(){
   localStorage.clear();
   location.reload();
 }
 
-/* ================= AUTO LOGIN ================= */
+/* AUTO LOGIN */
 if(localStorage.getItem("admin")) showApp(true);
 else if(localStorage.getItem("key")) showApp(false);
 
-/* ================= KEY GENERATION ================= */
+/* GENERATE KEY */
 async function generate(seconds){
   const key="EXEL-"+Math.random().toString(36).slice(2,6).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase();
   const expires=Date.now()+seconds*1000;
-
   const res = await fetch(`${SUPABASE_URL}/rest/v1/licenses`,{
     method:"POST",
     headers:{
@@ -304,15 +304,13 @@ async function generate(seconds){
     },
     body:JSON.stringify({ key:key, expires_at:expires })
   });
-
   if(!res.ok){ alert("Failed"); return; }
-
   await navigator.clipboard.writeText(key);
-  toast.textContent="Copied to clipboard 📋 → "+key;
-  toast.style.display="block";
-  setTimeout(()=>toast.style.display="none",1600);
+  const statusBar = document.getElementById("statusBar");
+  statusBar.textContent = "Copied to clipboard 📋 → "+key;
+  statusBar.style.display="block";
+  setTimeout(()=>statusBar.style.display="none",1600);
 }
 </script>
-
 </body>
 </html>
