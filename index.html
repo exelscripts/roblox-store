@@ -7,36 +7,38 @@
 
 <style>
 :root {
-    --bg: #020617;
-    --card: rgba(15,23,42,.78);
-    --border: rgba(56,189,248,.4);
-    --accent: #38bdf8;
-    --text: #e5e7eb;
+    --bg:#020617;
+    --card:rgba(15,23,42,.78);
+    --border:rgba(56,189,248,.4);
+    --accent:#38bdf8;
+    --text:#e5e7eb;
 }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: system-ui, sans-serif;
+* { box-sizing: border-box; }
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:system-ui,sans-serif;
     background:
-        radial-gradient(circle at top, #0f172a, transparent 60%),
-        linear-gradient(135deg, #020617, #020617);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--text);
+        radial-gradient(circle at top,#0f172a,transparent 60%),
+        linear-gradient(135deg,#020617,#020617);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:var(--text);
 }
 
-.card {
-    width: 92%;
-    max-width: 500px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(14px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 25px 50px rgba(0,0,0,.65);
-    animation: fade .45s ease;
+.card{
+    width:94%;
+    max-width:520px;
+    background:var(--card);
+    border:1px solid var(--border);
+    backdrop-filter:blur(14px);
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 25px 50px rgba(0,0,0,.65);
+    animation:fade .4s ease;
 }
 
 @keyframes fade {
@@ -44,93 +46,104 @@ body {
     to { opacity:1; transform:none; }
 }
 
-h2 {
-    margin: 0 0 14px;
-    color: #7dd3fc;
-    font-size: 1.2em;
+h2{
+    margin:0 0 14px;
+    color:#7dd3fc;
+    font-size:1.2em;
 }
 
-input {
-    width: 100%;
-    padding: 14px;
-    font-size: 1em;
-    border-radius: 12px;
-    background: rgba(2,6,23,.85);
-    border: 1px solid var(--border);
-    color: var(--text);
-    text-align: center;
+/* INPUT (FIXED SIZE) */
+input{
+    width:100%;
+    max-width:420px;
+    margin:0 auto;
+    display:block;
+
+    padding:13px 14px;
+    font-size:.98em;
+    border-radius:12px;
+    background:rgba(2,6,23,.85);
+    border:1px solid var(--border);
+    color:var(--text);
+    text-align:center;
 }
 
-input::placeholder {
-    color: #94a3b8;
+input::placeholder{ color:#94a3b8; }
+
+button{
+    width:100%;
+    margin-top:16px;
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    background:linear-gradient(135deg,#38bdf8,#60a5fa);
+    color:#020617;
+    font-weight:700;
+    cursor:pointer;
 }
 
-button {
-    width: 100%;
-    margin-top: 16px;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(135deg,#38bdf8,#60a5fa);
-    color: #020617;
-    font-weight: 700;
-    cursor: pointer;
+button:hover{
+    box-shadow:0 0 20px rgba(56,189,248,.45);
 }
 
-button:hover {
-    box-shadow: 0 0 20px rgba(56,189,248,.45);
+.small{
+    margin-top:10px;
+    font-size:.85em;
+    opacity:.75;
+    text-align:center;
 }
 
-.copy-box {
-    margin-top: 18px;
-    display: flex;
-    gap: 10px;
-    background: rgba(2,6,23,.8);
-    border: 1px solid var(--border);
-    padding: 14px;
-    border-radius: 14px;
+.dashboard{
+    margin-top:16px;
+    padding:14px;
+    border-radius:14px;
+    background:rgba(2,6,23,.8);
+    border:1px solid var(--border);
+    font-size:.95em;
 }
 
-.copy-box span {
-    flex: 1;
-    font-size: .8em;
-    color: #7dd3fc;
-    word-break: break-all;
+.copy-box{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    background:rgba(2,6,23,.8);
+    border:1px solid var(--border);
+    padding:14px;
+    border-radius:14px;
 }
 
-.copy-box button {
-    width: auto;
-    padding: 8px 14px;
+.copy-box span{
+    flex:1;
+    font-size:.8em;
+    color:#7dd3fc;
+    word-break:break-all;
 }
 
-.dashboard {
-    margin-top: 16px;
-    padding: 14px;
-    border-radius: 14px;
-    background: rgba(2,6,23,.8);
-    border: 1px solid var(--border);
-    font-size: .95em;
+.copy-box button{
+    width:auto;
+    padding:8px 14px;
 }
 
-.error {
-    margin-top: 10px;
-    color: #fca5a5;
-    font-size: .9em;
+.keylist{
+    margin-top:14px;
+    font-size:.8em;
+    white-space:pre-wrap;
+    color:#7dd3fc;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LICENSE SCREEN -->
+<!-- LOGIN -->
 <div class="card" id="login">
     <h2>Enter License Key</h2>
     <input id="keyInput" placeholder="EXEL-XH-XXXX-XXXX">
-    <button onclick="redeem()">Redeem Key</button>
-    <div class="error" id="error"></div>
+    <button onclick="redeem()">Redeem</button>
+    <div class="small">Admin? Enter admin key</div>
 </div>
 
-<!-- MAIN APP -->
+<!-- USER APP -->
 <div class="card" id="app" style="display:none;">
     <h2>exel hub finder paid, find brainrots INSTANTLY ⚡⏩</h2>
 
@@ -142,75 +155,95 @@ button:hover {
         <span>
 loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/refs/heads/main/exel"))()
         </span>
-        <button onclick="copy(this)">Copy</button>
+        <button onclick="copyScript(this)">Copy</button>
     </div>
 </div>
 
+<!-- ADMIN DASHBOARD -->
+<div class="card" id="admin" style="display:none;">
+    <h2>Admin Dashboard</h2>
+
+    <button onclick="generateKey(3600)">Generate 1 Hour Key</button>
+    <button onclick="generateKey(7200)">Generate 2 Hour Key</button>
+    <button onclick="generateKey(10800)">Generate 3 Hour Key</button>
+    <button onclick="generateKey(14400)">Generate 4 Hour Key</button>
+
+    <div class="dashboard keylist" id="output"></div>
+</div>
+
 <script>
-/* KEY DURATIONS (seconds) */
-const keys = {
-"EXEL-1H-A9Q7-MP2D":3600,"EXEL-1H-Z7Q1-A8MD":3600,"EXEL-1H-QA91-Z7MD":3600,
-"EXEL-1H-7AQP-Z91D":3600,"EXEL-1H-M9ZQ-A71D":3600,
+/* 🔐 CHANGE THIS */
+const ADMIN_KEY = "EXELADMINS2704";
 
-"EXEL-2H-AQ91-ZMD7":7200,"EXEL-2H-ZM7A-Q91D":7200,"EXEL-2H-Q7A9-ZM1D":7200,
-"EXEL-2H-9ZAM-Q71D":7200,"EXEL-2H-MA91-ZQ7D":7200,
+/* STORED KEYS */
+let keys = JSON.parse(localStorage.getItem("keys") || "{}");
 
-"EXEL-3H-QA9Z-M71D":10800,"EXEL-3H-ZA7M-Q91D":10800,"EXEL-3H-91QZ-AM7D":10800,
-"EXEL-3H-M7AQ-Z91D":10800,"EXEL-3H-AZQM-971D":10800,
+/* REDEEM */
+function redeem(){
+    const v = keyInput.value.trim().toUpperCase();
 
-"EXEL-4H-ZQ91-AM7D":14400,"EXEL-4H-A7MZ-Q91D":14400,"EXEL-4H-Q9AM-Z71D":14400,
-"EXEL-4H-MZ7A-Q91D":14400,"EXEL-4H-91AZ-QM7D":14400
-};
-
-/* REDEEM KEY (ONE TIME) */
-function redeem() {
-    const key = keyInput.value.trim().toUpperCase();
-    if (!keys[key]) {
-        error.textContent = "Invalid license key";
+    if(v === ADMIN_KEY){
+        login.style.display="none";
+        admin.style.display="block";
         return;
     }
 
-    const expiresAt = Date.now() + (keys[key] * 1000);
+    if(!keys[v]){
+        alert("Invalid license key");
+        return;
+    }
 
-    localStorage.setItem("redeemed", "true");
+    const expiresAt = Date.now() + (keys[v] * 1000);
     localStorage.setItem("expiresAt", expiresAt);
-
     showApp();
 }
 
-/* SHOW APP IF REDEEMED */
-function showApp() {
-    login.style.display = "none";
-    app.style.display = "block";
+/* USER APP */
+function showApp(){
+    login.style.display="none";
+    admin.style.display="none";
+    app.style.display="block";
     tick();
 }
 
-/* COUNTDOWN */
-function tick() {
+function tick(){
     const expires = +localStorage.getItem("expiresAt");
-    const remaining = Math.floor((expires - Date.now()) / 1000);
+    const left = Math.floor((expires - Date.now()) / 1000);
 
-    if (remaining <= 0) {
+    if(left <= 0){
         localStorage.clear();
         location.reload();
         return;
     }
 
     timeLeft.textContent =
-        new Date(remaining * 1000).toISOString().substr(11, 8);
+        new Date(left * 1000).toISOString().substr(11,8);
 
-    setTimeout(tick, 1000);
+    setTimeout(tick,1000);
 }
 
-/* COPY SCRIPT */
-function copy(btn) {
+/* COPY */
+function copyScript(btn){
     navigator.clipboard.writeText(btn.previousElementSibling.innerText);
-    btn.textContent = "Copied";
-    setTimeout(() => btn.textContent = "Copy", 1200);
+    btn.textContent="Copied";
+    setTimeout(()=>btn.textContent="Copy",1200);
 }
 
-/* AUTO LOGIN IF ALREADY REDEEMED */
-if (localStorage.getItem("redeemed") === "true") {
+/* ADMIN GENERATOR */
+function generateKey(seconds){
+    const key =
+        "EXEL-" +
+        Math.random().toString(36).substring(2,6).toUpperCase() +
+        "-" +
+        Math.random().toString(36).substring(2,6).toUpperCase();
+
+    keys[key] = seconds;
+    localStorage.setItem("keys", JSON.stringify(keys));
+    output.textContent += `${key} (${seconds/3600}h)\n`;
+}
+
+/* AUTO LOGIN */
+if(localStorage.getItem("expiresAt")){
     showApp();
 }
 </script>
