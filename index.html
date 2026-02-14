@@ -2,339 +2,207 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ExelNotifier Preview</title>
+<title>ExelNotifier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body {
+:root{
+  --bg:#020617;
+  --surface:#0f172a;
+  --accent:#38bdf8;
+  --accent-hover:#60a5fa;
+  --text:#e5e7eb;
+}
+
+/* PAUSED THEME */
+body.paused{
+  --bg:#0F172A;
+  --surface:#1E293B;
+  --accent:#10B981;
+  --accent-hover:#06402B;
+  --text:#F8FAFC;
+}
+
+body{
   margin:0;
   font-family:system-ui,sans-serif;
-  background:linear-gradient(135deg,#020617,#0f172a);
-  color:#e5e7eb;
+  background:var(--bg);
+  color:var(--text);
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
-  overflow-x:hidden;
+  transition:all .6s ease;
+}
+
+/* KEY PAUSED BANNER */
+.pause-banner{
+  position:fixed;
+  top:-120px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--accent);
+  color:white;
+  font-size:2rem;
+  font-weight:700;
+  padding:25px 80px;
+  border-radius:40px;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+  transition:all .6s cubic-bezier(.25,.8,.25,1);
+  z-index:100;
+}
+.pause-banner.show{
+  top:30px;
 }
 
 /* CARD */
-.card {
+.card{
   width:480px;
-  max-width:95vw;
-  background:rgba(15,23,42,.85);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(56,189,248,.4);
+  background:var(--surface);
   border-radius:22px;
-  padding:25px;
+  padding:30px;
   box-shadow:0 30px 80px rgba(0,0,0,.8);
-  position:relative;
-  transition: all .5s ease;
-}
-
-/* BLUR EFFECT */
-.blur {
-  filter: blur(6px);
-  transition: filter .5s ease;
+  transition:all .6s ease;
 }
 
 /* TITLE */
-.title {
+.title{
   display:flex;
   align-items:center;
   gap:14px;
   margin-bottom:20px;
-  font-size:1.3rem;
 }
-.logo-box {
-  width:50px;
-  height:50px;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:0 0 20px rgba(56,189,248,.8);
-  position:relative;
-  overflow:hidden;
-  cursor:pointer;
-  transition: all .3s ease;
-}
-.logo-box span {
-  font-size:28px;
-  display:inline-block;
-  position:relative;
-  z-index:2;
+.logo{
+  font-size:32px;
   animation:spin 2s linear infinite;
 }
-.logo-box::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:14px;
-  background:linear-gradient(45deg,#38bdf8,#60a5fa,#38bdf8);
-  filter:blur(10px);
-  opacity:.7;
-  z-index:1;
-  animation:turboTrail 2s linear infinite;
-}
-@keyframes spin {
+@keyframes spin{
   0%{transform:rotate(0deg);}
   100%{transform:rotate(360deg);}
-}
-@keyframes turboTrail {
-  0%{transform:rotate(0deg);}
-  100%{transform:rotate(360deg);}
-}
-.logo-box:hover {
-  transform:scale(1.2);
-  box-shadow:0 0 40px #38bdf8,0 0 80px #60a5fa;
 }
 
 /* INPUT */
-#keyInput {
-  width:70%;
-  margin:0 auto 14px auto;
-  display:block;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid rgba(56,189,248,.4);
-  background:rgba(2,6,23,.9);
-  color:white;
-  text-align:center;
+#keyInput{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--accent);
+  background:#00000033;
+  color:var(--text);
+  margin-bottom:12px;
 }
 
-/* BUTTONS */
-button {
-  width:70%;
-  margin:8px auto;
-  display:block;
-  padding:10px;
+/* BUTTON */
+button{
+  width:100%;
+  padding:12px;
   border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg,#38bdf8,#60a5fa);
-  color:#020617;
+  border-radius:12px;
   font-weight:700;
   cursor:pointer;
-  transition: all .3s ease;
+  background:var(--accent);
+  color:white;
+  transition:.4s;
 }
-button:hover {
-  transform:translateY(-2px);
-  box-shadow:0 0 20px rgba(56,189,248,.8);
-}
-
-/* PILL */
-.pill {
-  margin-top:12px;
-  padding:10px;
-  border-radius:10px;
-  background:rgba(2,6,23,.8);
-  border:1px solid rgba(56,189,248,.4);
-  text-align:center;
+button:hover{
+  background:var(--accent-hover);
 }
 
-/* ADMIN PANEL */
-#adminPanel {
-  max-height:0;
-  overflow:hidden;
-  opacity:0;
-  transition: all .5s ease;
-  margin-top:10px;
-}
-#adminPanel.open {
-  max-height:100px;
-  opacity:1;
-}
-
-/* FLOATING COPY BUTTON */
-.floating-copy {
-  position:fixed;
-  bottom:25px;
-  right:25px;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#38bdf8,#60a5fa);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  box-shadow:0 0 25px rgba(56,189,248,.9);
-  animation:pulse 2s infinite;
-  display:none;
-}
-.floating-copy:hover {
-  transform:scale(1.1);
-}
-@keyframes pulse {
-  0%{box-shadow:0 0 20px rgba(56,189,248,.7);}
-  50%{box-shadow:0 0 40px rgba(56,189,248,1);}
-  100%{box-shadow:0 0 20px rgba(56,189,248,.7);}
-}
-
-/* SUCCESS CHECK */
-.loading-overlay {
+/* SUCCESS OVERLAY */
+.overlay{
   position:absolute;
   inset:0;
-  background:rgba(2,6,23,.8);
+  background:#000000aa;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   border-radius:22px;
-  z-index:10;
   display:none;
 }
-.success-check {
-  font-size:72px;
+.check{
+  font-size:80px;
   color:#22c55e;
-  display:block;
-  animation:scaleUp 0.5s ease forwards;
+  animation:pop .4s ease;
 }
-@keyframes scaleUp {
+@keyframes pop{
   0%{transform:scale(0);}
   100%{transform:scale(1);}
 }
 
-/* KEY DISPLAY */
-.key-box {
-  margin-top:12px;
-  padding:10px;
-  background:rgba(0,0,0,.6);
-  border:1px solid #38bdf8;
-  border-radius:10px;
-  text-align:center;
-}
-
-/* TOAST */
-.toast {
+/* FLOATING PAUSE BUTTON */
+.pause-btn{
   position:fixed;
-  bottom:100px;
-  right:25px;
-  background:rgba(34,197,94,.15);
-  border:1px solid rgba(34,197,94,.5);
-  color:#bbf7d0;
-  padding:12px 18px;
-  border-radius:12px;
-  font-size:.9rem;
-  opacity:0;
-  transition:.3s ease;
+  right:30px;
+  bottom:30px;
+  padding:14px 22px;
+  border-radius:30px;
+  background:var(--accent);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 0 25px rgba(0,0,0,.6);
+  transition:.4s;
 }
-.toast.show {opacity:1;}
+.pause-btn:hover{
+  background:var(--accent-hover);
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN CARD -->
-<div id="login" class="card">
+<div class="pause-banner" id="pauseBanner">KEY PAUSED</div>
+
+<div class="card" id="login">
   <div class="title">
-    <div class="logo-box"><span>⚡</span></div>
+    <div class="logo">⚡</div>
     <h2>ExelNotifier</h2>
   </div>
+
   <input id="keyInput" placeholder="EXEL-XXXX-XXXX">
-  <button id="redeemBtn">Redeem</button>
-  <div class="loading-overlay" id="loadingBox">
-    <div class="success-check" id="successCheck">✔</div>
+  <button onclick="redeem()">Redeem</button>
+
+  <div class="overlay" id="overlay">
+    <div class="check">✔</div>
   </div>
 </div>
 
-<!-- APP CARD -->
-<div id="app" class="card" style="display:none">
-  <div class="title">
-    <div class="logo-box"><span>⚡</span></div>
-    <h2>ExelNotifier</h2>
-  </div>
-  <div class="pill">⏳ Time remaining: <b id="timeLeft">inf ♾️</b></div>
-  <div id="keyDisplay" class="key-box"></div>
-  <div id="adminPanel"></div>
-  <button onclick="logout()" style="background:#ef4444;color:white;">Logout</button>
-</div>
-
-<!-- FLOATING COPY BUTTON -->
-<div class="floating-copy" id="copyBtn" onclick="copyScript()">📋</div>
-<div class="toast" id="toast">Copied to clipboard ✅</div>
+<div class="pause-btn" id="pauseBtn" onclick="togglePause()">Pause Key</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", ()=>{
-  const login = document.getElementById("login");
-  const app = document.getElementById("app");
-  const keyInput = document.getElementById("keyInput");
-  const loadingBox = document.getElementById("loadingBox");
-  const successCheck = document.getElementById("successCheck");
-  const copyBtn = document.getElementById("copyBtn");
-  const adminPanel = document.getElementById("adminPanel");
-  const keyDisplay = document.getElementById("keyDisplay");
-  const toast = document.getElementById("toast");
+let paused = false;
 
-  const ADMIN_KEY="EXEL-ADMIN-2704";
-
-  function showToast(msg){
-    toast.textContent=msg;
-    toast.classList.add("show");
-    setTimeout(()=>toast.classList.remove("show"),1800);
+function redeem(){
+  const key = document.getElementById("keyInput").value.trim().toUpperCase();
+  if(!key || !key.startsWith("EXEL-")) {
+    alert("Invalid Key");
+    return;
   }
 
-  document.getElementById("redeemBtn").addEventListener("click", ()=>{
-    const key = keyInput.value.trim().toUpperCase();
-    if(!key) {
-      alert("Enter a key");
-      return;
-    }
+  const overlay = document.getElementById("overlay");
+  overlay.style.display="flex";
 
-    // Only valid keys
-    if(key===ADMIN_KEY || key.startsWith("EXEL-")){
-      // Show overlay with checkmark
-      loadingBox.style.display="flex";
-      login.classList.add("blur");
+  setTimeout(()=>{
+    overlay.style.display="none";
+    alert("Dashboard Loaded (Preview)");
+  },2000);
+}
 
-      setTimeout(()=>{
-        // Hide overlay and unblur
-        loadingBox.style.display="none";
-        login.classList.remove("blur");
-        login.style.display="none";
-        app.style.display="block";
-        copyBtn.style.display="flex";
+function togglePause(){
+  paused = !paused;
+  const body = document.body;
+  const banner = document.getElementById("pauseBanner");
+  const btn = document.getElementById("pauseBtn");
 
-        keyDisplay.textContent = "Your Key: " + key;
-
-        // Admin infinite key button
-        if(key===ADMIN_KEY){
-          adminPanel.classList.add("open");
-          adminPanel.innerHTML="";
-          const b = document.createElement("button");
-          b.textContent="Generate Infinite Key";
-          b.onclick=()=>{
-            const key="EXEL-"+Math.random().toString(36).slice(2,6).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase();
-            navigator.clipboard.writeText(key);
-            showToast("Infinite Key Copied: "+key);
-          };
-          adminPanel.appendChild(b);
-        }
-
-      },2000);
-
-    } else {
-      alert("Invalid key");
-    }
-  });
-
-  // Copy script
-  window.copyScript = ()=>{
-    const script='loadstring(game:HttpGet("https://raw.githubusercontent.com/exelscripts/joiner/refs/heads/main/exel"))()';
-    navigator.clipboard.writeText(script);
-    showToast("Script copied 📋");
+  if(paused){
+    body.classList.add("paused");
+    banner.classList.add("show");
+    btn.textContent="Unpause Key";
+  }else{
+    body.classList.remove("paused");
+    banner.classList.remove("show");
+    btn.textContent="Pause Key";
   }
-
-  // Logout
-  window.logout = ()=>{
-    login.style.display="block";
-    app.style.display="none";
-    copyBtn.style.display="none";
-    keyInput.value="";
-    keyDisplay.textContent="";
-    adminPanel.innerHTML="";
-    adminPanel.classList.remove("open");
-  }
-});
+}
 </script>
 
 </body>
